@@ -1,72 +1,51 @@
-<html>
-	<head>
-		
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.12/d3.min.js" charset="utf-8"></script>
-		<script src="require.js" data-main="main.js"></script>
-		<script src="options.js"></script>
-		<script src="genealogy.tree.js"></script>
-		
-		<style>
-		svg {
-  background-color: #FFF;
-  cursor: default;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -o-user-select: none;
-  user-select: none;
-}
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style type="text/css">
+  
+	.node {
+    cursor: pointer;
+  }
 
-svg:not(.active):not(.ctrl) {
-  cursor: crosshair;
-}
+  .overlay{
+      background-color:#EEE;
+  }
+   
+  .node circle {
+    fill: #fff;
+    stroke: steelblue;
+    stroke-width: 1.5px;
+  }
+   
+  .node text {
+    font-size:10px; 
+    font-family:sans-serif;
+  }
+   
+  .link {
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 1.5px;
+  }
 
-path.link {
-  fill: none;
-  stroke: #000;
-  stroke-width: 4px;
-  cursor: default;
-}
+  .templink {
+    fill: none;
+    stroke: red;
+    stroke-width: 3px;
+  }
 
-svg:not(.active):not(.ctrl) path.link {
-  cursor: pointer;
-}
+  .ghostCircle.show{
+      display:block;
+  }
 
-path.link.selected {
-  stroke-dasharray: 10,2;
-}
+  .ghostCircle, .activeDrag .ghostCircle{
+       display: none;
+  }
 
-path.link.dragline {
-  pointer-events: none;
-}
-
-path.link.hidden {
-  stroke-width: 0;
-}
-
-circle.node {
-  stroke-width: 1.5px;
-  cursor: pointer;
-}
-
-circle.node.reflexive {
-  stroke: #000 !important;
-  stroke-width: 2.5px;
-}
-
-text {
-  font: 12px sans-serif;
-  pointer-events: none;
-}
-
-text.id {
-  text-anchor: middle;
-  font-weight: bold;
-}
-		</style>
-	</head>
-	
-	<body>
-	
-	</body>
+</style>
+<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="dndTree2.js"></script>
+<body>
+    <div id="tree-container"></div>
+</body>
 </html>
