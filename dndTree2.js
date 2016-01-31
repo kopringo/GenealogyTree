@@ -4,12 +4,15 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
     // Calculate total nodes, max label length
     var totalNodes = 0;
     var maxLabelLength = 0;
+    
     // variables for drag/drop
     var selectedNode = null;
     var draggingNode = null;
+    
     // panning variables
     var panSpeed = 200;
     var panBoundary = 20; // Within 20px from edges will pan when dragging.
+    
     // Misc. variables
     var i = 0;
     var duration = 750;
@@ -19,8 +22,7 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
     var viewerWidth = $(document).width();
     var viewerHeight = $(document).height();
 
-    var tree = d3.layout.tree()
-        .size([viewerHeight, viewerWidth]);
+    var tree = d3.layout.tree2().size([viewerHeight, viewerWidth]);
 
     // define a d3 diagonal projection for use by the node paths later on.
     var diagonal = d3.svg.diagonal()
@@ -52,7 +54,6 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
     }, function(d) {
         return d.children && d.children.length > 0 ? d.children : null;
     });
-
 
     // sort the tree according to the node names
 
@@ -336,6 +337,9 @@ treeJSON = d3.json("flare.json", function(error, treeData) {
     }
 
     function update(source) {
+    	
+    	//console.log(source);
+    	
         // Compute the new height, function counts total children of root node and sets tree height accordingly.
         // This prevents the layout looking squashed when new nodes are made visible or looking sparse when nodes are removed
         // This makes the layout more consistent.
