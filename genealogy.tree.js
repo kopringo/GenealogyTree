@@ -97,7 +97,7 @@ var NodePerson = function(id, firstname, lastname){
 	this.position_y = 0;	// absolute y
 	this.position_rx = 0;	// relative x
 	this.position_ry = 0;	// relative y
-	this.size_w = 1;
+	this.size_w = 0;
 	
 	this.rendered = false;
 	this.visited = false;
@@ -109,6 +109,8 @@ var NodeFamily = function(id, p1, p2, children){
 	
 	this.children = children || [];
 	
+	// xy
+	this.size_w = 0;
 	
 	return this;
 }
@@ -128,8 +130,6 @@ var GenealogyTree = function(config){
 	
 	console.log('1');
 	
-	
-	
 	return this;
 }
 
@@ -143,15 +143,46 @@ GenealogyTree.prototype.clearNodes = function(){
 	}
 }
 
-GenealogyTree.prototype.fixPositions = function(start){
-	if( start == null ){
-		start = Object.keys(this.person_list)[0].id;
+GenealogyTree.prototype._moveTreeToZeroZero = function(node){
+	
+	// find the offset
+	
+	// apply the offset
+	
+}
+
+GenealogyTree.prototype._fixPositions = function(node){
+	
+	if( this.person_list[node].visited ){
+		return;
 	}
 	
-	var pid = start;
+	this.person_list[node].visited = 1;
+	
+	// @todo calc position_x, position_y
+	
+	//console.log(this.person_list[node]);
+	
+}
+
+GenealogyTree.prototype.fixPositions = function(pid){
+	
+	console.log('fixPositions');
+	
+	if( pid == null ){
+		pid = Object.keys(this.person_list)[0].id;
+	}
+	
+	this.clearNodes();
+	
+	this.person_list[pid].position_x = 0;
+	this.person_list[pid].position_y = 0;
 	
 	
-	//var w = this.calc_child_width(start);
+	
+	this._fixPositions(pid);
+	
+	this._moveTreeToZeroZero();
 	
 }
 
@@ -163,14 +194,16 @@ GenealogyTree.prototype.fixPositions = function(start){
  */
 GenealogyTree.prototype.calcWidth = function(pid){
 	
+	console.log('');
+	console.log('calcWidth', pid);
+	
 	// jesli juz policzone do zwracamy
-	console.log(this.person_list);
-	console.log(pid);
-	if( this.person_list[pid].size_w > 0 ){
-		return this.person_list[pid].size_w;
-	}
+//	if( this.person_list[pid].size_w > 0 ){
+//		return this.person_list[pid].size_w;
+//	}
 	
 	// jesli nie mamy rodzin to szerokosc 1
+	console.log('families.length', this.person_list[pid].families.length);
 	if( this.person_list[pid].families.length == 0 ){
 		this.person_list[pid].size_w = 1;
 		return 1;
@@ -181,25 +214,31 @@ GenealogyTree.prototype.calcWidth = function(pid){
 		var family_id = this.person_list[pid].families[family_idx];
 		var sum = 0;
 		var family = this.family_list[family_id];
+		console.log(family_id, family.children);
 		for( var child in family.children ){
 			sum += this.calcWidth(child);
 		}
+		console.log('sum0', sum);
 		
 		// odleglosc miedzy osobami
 		sum += (family.children.length - 1);
+		console.log('sum1', sum);
 		
 		// rodzina minimalnie szerokosc 3
 		if(sum < 3){
 			sum = 3;
 		}
 		
+		this.family_list[family_id].size_w = sum;
+		
 		sum_all += sum;
+		console.log('sum', sum);
 	}
 	
 	// odleglosc miedzy rodzinami
 	sum_all += (this.person_list[pid].families.length - 1);	
-	
 	this.person_list[pid].size_w = sum_all;
+	console.log('sum_all', sum_all);
 	return sum_all;
 }
 
@@ -208,6 +247,9 @@ GenealogyTree.prototype.calcWidth = function(pid){
  * 
  */
 GenealogyTree.prototype.fixRelPositions = function(fid){
+	
+	console.log('fixRelPositions', fid);
+	
 	var family = this.family_list[fid];
 	
 	var sum = 0;
@@ -278,24 +320,10 @@ GenealogyTree.prototype.delChild = function(fid, pid){
 
 // ============================================================================
 
-/*
-gt.addParents(id, id1, id2)
-gt.addPartner(id, id_new)
-gt.addRenderer(renderer)
-gt.deletePerson(id)
-gt.deleteParents(id)
-gt.stopRender()
-gt.startRender(scan_all)
-*/
-
-
-
-document.addEventListener('DOMContentLoaded', function(){
-	
+document.addEventListener('DOMContentLoaded', function(){	
 	//var tree = new GenealogyTree();
 	//tree.addPerson('aaa');
 });
-
 
 console.log("ok, to dziala");
 
@@ -335,13 +363,13 @@ $(function(){
 		gt.addPerson(27);
 		gt.addPerson(28);
 		
-		var fid1 = gt.addFamily(null, 1, 2);
-		var fid2 = gt.addFamily(null, 6, 7);
-		var fid3 = gt.addFamily(null, 26, 27);
-		var fid4 = gt.addFamily(null, 10, 9);
-		var fid5 = gt.addFamily(null, 14, 15);
-		var fid6 = gt.addFamily(null, 10, 20);
-		var fid7 = gt.addFamily(null, 21, 22);
+		var fid1 = gt.addFamily(1, 1, 2);
+		var fid2 = gt.addFamily(2, 6, 7);
+		var fid3 = gt.addFamily(3, 26, 27);
+		var fid4 = gt.addFamily(4, 10, 9);
+		var fid5 = gt.addFamily(5, 14, 15);
+		var fid6 = gt.addFamily(6, 10, 20);
+		var fid7 = gt.addFamily(7, 21, 22);
 		
 		gt.addChild(fid7, 19);
 		gt.addChild(fid6, 14);
@@ -373,41 +401,10 @@ $(function(){
 			console.log(p_idx, ': ', gt.person_list[p_idx].position_rx );
 		}
 		
-		/*
-		var fid = gt.addFamily(null, 1, 2);
-		gt.addChild(fid, 3);
-		var fid2 = gt.addFamily(null, 4, null);
-		gt.addChild(fid2, 1);
-		console.log(gt);
-		*/
-		
-		gt.fixPositions()
+		gt.fixPositions(1)
 		console.log(gt);
 		
 	} else {
 		alert('SVG not supported');
 	}
 });
-
-
-/*
-var __iterator__, i;
-var __args_0, __kwargs_0;
-__args_0 = create_array(0, 10);
-__kwargs_0 = {};
-__iterator__ = get_attribute(get_attribute(get_attribute(xrange, "__call__")(__args_0, __kwargs_0), "__iter__"), "__call__")(create_array(), {});
-try {
-i = get_attribute(__iterator__, "next")(create_array(), {});
-while(true) {
-console.log(i);
-undefined;
-i = get_attribute(__iterator__, "next")(create_array(), {});
-}
-}
-catch(__exception__) {
-if (__exception__ == StopIteration || isinstance([__exception__, StopIteration])) {
-
-}
-
-}
-*/
