@@ -107,6 +107,10 @@ var NodePerson = function(id, firstname, lastname){
 
 var NodeFamily = function(id, p1, p2, children){
 	
+	this.up_parent = null;	// link do rodzica
+	
+	this.parent1 = p1;
+	this.parent2 = p2;
 	this.children = children || [];
 	
 	// xy
@@ -117,10 +121,10 @@ var NodeFamily = function(id, p1, p2, children){
 
 var GenealogyTree = function(config){
 	
-	this.person_list = {}
-	this.family_list = {}
+	this.person_list = {};
+	this.family_list = {};
 	
-	this.renderer_list = []
+	this.renderer_list = [];
 	
 	var margin = {top: 0, right: 320, bottom: 0, left: 0},
     width = 960 - margin.left - margin.right,
@@ -131,11 +135,11 @@ var GenealogyTree = function(config){
 	console.log('1');
 	
 	return this;
-}
+};
 
 GenealogyTree.prototype.addRenderer = function(renderer){
 	this.renderer_list.push(renderer);
-}
+};
 
 GenealogyTree.prototype.clearNodes = function(){
 	for( var node in this.person_list ){
@@ -243,12 +247,10 @@ GenealogyTree.prototype.calcWidth = function(pid){
 }
 
 /**
- * Aktualizuje relatywne pozycje...
+ * Aktualizuje relatywne pozycje oraz szerokosci, idzie w górę
  * 
  */
-GenealogyTree.prototype.fixRelPositions = function(fid){
-	
-	console.log('fixRelPositions', fid);
+GenealogyTree.prototype.fixWidthPositions = function(fid){
 	
 	var family = this.family_list[fid];
 	
@@ -258,6 +260,9 @@ GenealogyTree.prototype.fixRelPositions = function(fid){
 		this.person_list[child_id].position_rx = sum;
 		sum += this.calcWidth(child_id);
 	}
+	
+	this.family_list[fid].size_w = sum;
+	//if( family.children > 0 ) 
 	
 	// przesuwam w lewo
 	var offset = parseInt(sum / 2);
@@ -277,16 +282,16 @@ GenealogyTree.prototype.addPerson = function(id, params){
 	this.person_list[id] = person;
 	
 	this.calcWidth(id);
-}
+};
 
 GenealogyTree.prototype.delPerson = function(id){
 	
-}
+};
 
 GenealogyTree.prototype.addFamily = function(id, pid1, pid2){
 	
 	if(id == null){
-		id = Object.keys(this.family_list).length
+		id = Object.keys(this.family_list).length;
 	}
 	
 	this.family_list[id] = new NodeFamily(id, pid1, pid2, []);
@@ -297,26 +302,27 @@ GenealogyTree.prototype.addFamily = function(id, pid1, pid2){
 	this.calcWidth(pid2);
 	
 	return id;
-}
+};
 
 GenealogyTree.prototype.delFamily = function(person_id, person){
 	
-}
+};
 
 GenealogyTree.prototype.addChild = function(fid, pid){
 	
 	this.person_list[pid].family = fid;
 	this.family_list[fid].children.push(pid);
 	
-	//this.calcWidth(pid);
+	this.fixWidthPositions(fid);
 	
-	this.fixRelPositions(fid);
-	
-}
+};
 
 GenealogyTree.prototype.delChild = function(fid, pid){
 	
-}
+	// @todo
+	
+	this.fixWidthPositions(fid);
+};
 
 // ============================================================================
 
